@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TrueWage - real hourly wage</title>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif; background:#0f141a; color:#e9eef2; min-height:100vh; }
+  .wrap { max-width:860px; margin:0 auto; padding:28px 20px 80px; }
+  header { display:flex; justify-content:space-between; align-items:center; margin-bottom:22px; }
+  header h1 { font-size:22px; } header h1 span { color:#8be0a4; }
+  header a { color:#8798a5; text-decoration:none; font-size:14px; }
+  .card { background:#151c22; border:1px solid #26343a; border-radius:12px; padding:18px; margin-bottom:18px; }
+  label { font-size:12px; color:#8798a5; display:block; margin-bottom:4px; }
+  input { background:#0f141a; border:1px solid #33494a; border-radius:8px; color:#e9eef2; padding:9px 10px; font-size:14px; width:100%; }
+  button { background:#8be0a4; border:none; color:#0c2015; font-weight:700; padding:11px 22px; border-radius:9px; font-size:14px; cursor:pointer; }
+  button.ghost { background:transparent; border:1px solid #3a5a4a; color:#8be0a4; }
+  .row4 { display:grid; grid-template-columns:1fr 1fr 1fr 1fr; gap:12px; margin-bottom:12px; }
+  .row3 { display:grid; grid-template-columns:1fr 1fr 1fr; gap:12px; margin-bottom:12px; }
+  h3 { font-size:14px; color:#b8c8d4; margin-bottom:10px; }
+  .jobtitle { font-size:13px; color:#8be0a4; font-weight:700; margin-bottom:10px; text-transform:uppercase; letter-spacing:1px; }
+  .big { text-align:center; padding:26px 16px; }
+  .big .wage { font-size:56px; font-weight:800; color:#8be0a4; }
+  .big .cap { color:#8798a5; font-size:14px; margin-top:4px; }
+  .big .nom { color:#5c6c78; font-size:13px; margin-top:10px; }
+  .stats { display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:12px; margin-top:6px; }
+  .stat { background:#0f141a; border:1px solid #26343a; border-radius:10px; padding:12px; }
+  .stat .v { font-size:20px; font-weight:700; color:#fff; }
+  .stat .k { font-size:11px; color:#8798a5; margin-top:2px; line-height:1.4; }
+  .verdict { background:#12211a; border:1px solid #2a4a3a; border-radius:10px; padding:14px 16px; margin-bottom:14px; font-size:15px; line-height:1.6; }
+  .verdict b { color:#8be0a4; }
+  .err { color:#ff8a8a; font-size:13px; }
+  #jobb { display:none; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header><h1>True<span>Wage</span></h1><a href="index.html">home</a></header>
+
+  <div class="card">
+    <div class="jobtitle" id="titlea">The job</div>
+    <div class="row4">
+      <div><label>Gross salary ($/yr)</label><input id="a-salary" type="number" value="95000"></div>
+      <div><label>Tax rate (%)</label><input id="a-tax" type="number" value="25"></div>
+      <div><label>Contract hours/wk</label><input id="a-contract" type="number" value="40"></div>
+      <div><label>Actual hours/wk</label><input id="a-actual" type="number" value="45"></div>
+    </div>
+    <div class="row4">
+      <div><label>Commute (min/day, both ways)</label><input id="a-commin" type="number" value="50"></div>
+      <div><label>Days in office/wk</label><input id="a-days" type="number" step="0.5" value="5"></div>
+      <div><label>Work weeks/yr</label><input id="a-weeks" type="number" value="47"></div>
+      <div><label>Commute cost ($/day)</label><input id="a-comcost" type="number" step="0.5" value="8"></div>
+    </div>
+    <div class="row3">
+      <div><label>Other work costs ($/mo - lunches, wardrobe, gear)</label><input id="a-wcost" type="number" value="150"></div>
+      <div></div><div></div>
+    </div>
+  </div>
+
+  <div class="card" id="jobb">
+    <div class="jobtitle">The other offer</div>
+    <div class="row4">
+      <div><label>Gross salary ($/yr)</label><input id="b-salary" type="number" value="88000"></div>
+      <div><label>Tax rate (%)</label><input id="b-tax" type="number" value="24"></div>
+      <div><label>Contract hours/wk</label><input id="b-contract" type="number" value="40"></div>
+      <div><label>Actual hours/wk</label><input id="b-actual" type="number" value="40"></div>
+    </div>
+    <div class="row4">
+      <div><label>Commute (min/day, both ways)</label><input id="b-commin" type="number" value="0"></div>
+      <div><label>Days in office/wk</label><input id="b-days" type="number" step="0.5" value="1"></div>
+      <div><label>Work weeks/yr</label><input id="b-weeks" type="number" value="47"></div>
+      <div><label>Commute cost ($/day)</label><input id="b-comcost" type="number" step="0.5" value="8"></div>
+    </div>
+    <div class="row3">
+      <div><label>Other work costs ($/mo)</label><input id="b-wcost" type="number" value="30"></div>
+      <div></div><div></div>
+    </div>
+  </div>
+
+  <div style="display:flex; gap:12px; margin-bottom:18px;">
+    <button id="go">Calculate</button>
+    <button class="ghost" id="cmp">Compare another offer</button>
+  </div>
+  <div class="err" id="err"></div>
+  <div id="out"></div>
+</div>
+<script src="engine.js"></script>
+<script>
+(function(){
+  const $ = id => document.getElementById(id);
+  function esc(s){ return String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
+  function usd(x){ return '$' + Math.round(x).toLocaleString('en-US'); }
+  function hr(x){ return '$' + x.toFixed(2); }
+  function hrs(x){ return Math.round(x).toLocaleString('en-US'); }
+
+  function read(p){
+    return { salary: $(p+'-salary').value, taxPct: $(p+'-tax').value, contractHours: $(p+'-contract').value,
+      actualHours: $(p+'-actual').value, commuteMinPerDay: $(p+'-commin').value, daysPerWeek: $(p+'-days').value,
+      weeksPerYear: $(p+'-weeks').value, commuteCostPerDay: $(p+'-comcost').value, monthlyWorkCosts: $(p+'-wcost').value };
+  }
+
+  function statCard(r, label){
+    return '<h3 style="margin-top:4px">' + esc(label) + '</h3><div class="stats">'
+      + '<div class="stat"><div class="v">' + hr(r.realWage) + '/h</div><div class="k">real wage (net of costs, all hours)</div></div>'
+      + '<div class="stat"><div class="v">' + hr(r.nominalWage) + '/h</div><div class="k">nominal wage (gross, contract hours)</div></div>'
+      + '<div class="stat"><div class="v">' + hrs(r.totalHours) + ' h</div><div class="k">hours given per year (' + hrs(r.workHours) + ' work + ' + hrs(r.commuteHours) + ' commute)</div></div>'
+      + '<div class="stat"><div class="v">' + usd(r.workCostsAnnual) + '</div><div class="k">annual cost of working (' + usd(r.commuteCostAnnual) + ' commuting)</div></div>'
+      + '<div class="stat"><div class="v">' + hrs(r.unpaidOvertimeHours) + ' h</div><div class="k">unpaid overtime per year</div></div>'
+      + '<div class="stat"><div class="v">' + usd(r.realNet) + '</div><div class="k">real take-home after work costs</div></div>'
+      + '</div>';
+  }
+
+  function calc(){
+    $('err').textContent = '';
+    const compare = $('jobb').style.display !== 'none';
+    try {
+      localStorage.setItem('truewage-a', JSON.stringify(read('a')));
+      if (compare) localStorage.setItem('truewage-b', JSON.stringify(read('b')));
+    } catch(e) {}
+    try {
+      if (!compare) {
+        const r = TrueWageEngine.analyze(read('a'));
+        const gap = r.nominalWage > 0 ? (1 - r.realWage / r.nominalWage) * 100 : 0;
+        $('out').innerHTML = '<div class="card big"><div class="wage">' + hr(r.realWage) + '</div>'
+          + '<div class="cap">per hour of your life - after taxes, work costs, overtime and commute</div>'
+          + '<div class="nom">the offer letter implies ' + hr(r.nominalWage) + '/h; reality is ' + Math.round(gap) + '% lower</div></div>'
+          + '<div class="card">' + statCard(r, 'Where it all goes') + '</div>';
+      } else {
+        const c = TrueWageEngine.compare(read('a'), read('b'));
+        let v;
+        if (c.winner === 'tie') v = 'A true toss-up: both offers pay the same real wage.';
+        else {
+          const w = c.winner === 'b' ? 'The other offer' : 'The current job';
+          const wr = c.winner === 'b' ? c.b : c.a, lr = c.winner === 'b' ? c.a : c.b;
+          v = '<b>' + w + ' wins</b> on real wage: ' + hr(wr.realWage) + '/h vs ' + hr(lr.realWage) + '/h - a gap of ' + hr(c.realWageDelta)
+            + '/h, worth about <b>' + usd(c.annualGap) + ' a year</b> at that schedule.'
+            + (wr.salary < lr.salary ? ' The lower salary is the better deal.' : '');
+        }
+        $('out').innerHTML = '<div class="verdict">' + v + '</div>'
+          + '<div class="card">' + statCard(c.a, 'The job') + '<div style="height:14px"></div>' + statCard(c.b, 'The other offer') + '</div>';
+      }
+    } catch(e) {
+      $('out').innerHTML = '';
+      $('err').textContent = e.message;
+    }
+  }
+
+  $('cmp').onclick = function(){
+    const show = $('jobb').style.display === 'none';
+    $('jobb').style.display = show ? 'block' : 'none';
+    $('titlea').textContent = show ? 'The current job' : 'The job';
+    this.textContent = show ? 'Hide comparison' : 'Compare another offer';
+    calc();
+  };
+  $('go').onclick = calc;
+  try {
+    const a = JSON.parse(localStorage.getItem('truewage-a') || 'null');
+    if (a) { $('a-salary').value=a.salary; $('a-tax').value=a.taxPct; $('a-contract').value=a.contractHours; $('a-actual').value=a.actualHours; $('a-commin').value=a.commuteMinPerDay; $('a-days').value=a.daysPerWeek; $('a-weeks').value=a.weeksPerYear; $('a-comcost').value=a.commuteCostPerDay; $('a-wcost').value=a.monthlyWorkCosts; }
+    const b = JSON.parse(localStorage.getItem('truewage-b') || 'null');
+    if (b) { $('b-salary').value=b.salary; $('b-tax').value=b.taxPct; $('b-contract').value=b.contractHours; $('b-actual').value=b.actualHours; $('b-commin').value=b.commuteMinPerDay; $('b-days').value=b.daysPerWeek; $('b-weeks').value=b.weeksPerYear; $('b-comcost').value=b.commuteCostPerDay; $('b-wcost').value=b.monthlyWorkCosts; }
+  } catch(e) {}
+  calc();
+})();
+</script>
+</body>
+</html>
